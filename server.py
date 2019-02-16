@@ -16,11 +16,11 @@ from urllib.parse import urlparse
 
 TWILIO_FLOW_URL = "https://studio.twilio.com/v1/Flows/{sid}/Executions"
 
-CONFIG_FILE = "/etc/twilio_pager/twilio_pager.ini"
+CONFIG_FILE = "/etc/twilio-pager/twilio-pager.ini"
 if "TWILIO_PAGER_CONFIG" in os.environ:
     CONFIG_FILE = os.environ["TWILIO_PAGER_CONFIG"]
 
-LOG_FILE = "/var/log/twilio_pager/twilio_pager.log"
+LOG_FILE = "/var/log/twilio-pager/twilio-pager.log"
 if "TWILIO_PAGER_LOG" in os.environ:
     LOG_FILE = os.environ["TWILIO_PAGER_LOG"]
 
