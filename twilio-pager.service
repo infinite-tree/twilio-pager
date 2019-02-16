@@ -1,13 +1,20 @@
- [Unit]
- Description=Twilio/Grafana Pager bridge
- After=multi-user.target
+[Unit]
+Description=Twilio/Grafana Pager bridge
+After=multi-user.target
+Wants=network-online.target
+After=network-online.target
 
- [Service]
- Type=idle
- ExecStart=/usr/bin/python3 /opt/twilio-pager/server.py
- User=grafana
- Group=grafana
- Restart=always
+[Service]
+Type=simple
+WorkingDirectory=/opt/twilio-pager
+ExecStart=/usr/bin/python3 /opt/twilio-pager/server.py 8099
+User=grafana
+Group=grafana
+Restart=on-failure
 
- [Install]
- WantedBy=multi-user.target
+LimitNOFILE=10000
+TimeoutStopSec=20
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target
