@@ -12,7 +12,7 @@ import logging.handlers
 import os
 import requests
 import sys
-import urlparse
+from urllib.parse import urlparse
 
 TWILIO_FLOW_URL = "https://studio.twilio.com/v1/Flows/{sid}/Executions"
 
