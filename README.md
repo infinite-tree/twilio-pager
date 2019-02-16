@@ -33,7 +33,7 @@ vim /etc/twilio-pager/twilio-pager.ini
 
 mkdir /var/log/twilio-pager
 
-sudo cp twilio-pager.service /etc/systemd/system/multi-user.target.wants/
+sudo cp twilio-pager.service /etc/systemd/system/
 sudo systemctl enable twilio-pager.service
 sudo systemctl start twilio-pager.service
 ```
