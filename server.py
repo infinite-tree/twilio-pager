@@ -122,7 +122,7 @@ class Bridge(BaseHTTPRequestHandler):
 
         # All done
         self.log.info("Twilio POST SUCCEEDED!")
-        self.respon(200, "success")
+        self.respond(200, "success")
         return
 
 def run(log, port=8080):
