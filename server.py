@@ -95,8 +95,7 @@ class Bridge(BaseHTTPRequestHandler):
                 self._respond(500, "keyvalue creation failed: " + r.reason)
                 return
 
-            post_data["status_path"] = r.content.strip().replace(
-                    "https://api.keyvalue.xyz/", "")
+            post_data["status_path"] = r.content.strip().replace("https://api.keyvalue.xyz/".encode("utf-8"), "".encode("utf-8"))
 
             r = requests.post("https://api.keyvalue.xyz/%s/%s"%(post_data["status_path"], "pending"))
             if r.status_code != 200:
