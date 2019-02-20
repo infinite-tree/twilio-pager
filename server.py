@@ -95,7 +95,7 @@ class Bridge(BaseHTTPRequestHandler):
                 self._respond(500, "keyvalue creation failed: " + r.reason)
                 return
 
-            post_data["status_path"] = str(r.content.strip().replace("https://api.keyvalue.xyz/".encode("utf-8"), "".encode("utf-8")))
+            post_data["status_path"] = r.content.strip().replace("https://api.keyvalue.xyz/".encode("utf-8"), "".encode("utf-8")).decode()
             post_path = "https://api.keyvalue.xyz/%s/%s" % (post_data["status_path"], "pending")
             self.log.info("keyvalue post path: " + post_path)
             r = requests.post(post_path)
@@ -125,7 +125,7 @@ class Bridge(BaseHTTPRequestHandler):
 
             # All done
             self.log.info("Twilio POST SUCCEEDED!")
-            self.respond(200, "success")
+            self._respond(200, "success")
             return
         except Exception as e:
             self.log.error("Exception in do_POST: " + str(e))
