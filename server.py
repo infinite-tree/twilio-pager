@@ -95,9 +95,10 @@ class Bridge(BaseHTTPRequestHandler):
                 self._respond(500, "keyvalue creation failed: " + r.reason)
                 return
 
-            post_data["status_path"] = r.content.strip().replace("https://api.keyvalue.xyz/".encode("utf-8"), "".encode("utf-8"))
-
-            r = requests.post("https://api.keyvalue.xyz/%s/%s"%(post_data["status_path"], "pending"))
+            post_data["status_path"] = str(r.content.strip().replace("https://api.keyvalue.xyz/".encode("utf-8"), "".encode("utf-8")))
+            post_path = "https://api.keyvalue.xyz/%s/%s" % (post_data["status_path"], "pending")
+            self.log.info("keyvalue post path: " + post_path)
+            r = requests.post(post_path)
             if r.status_code != 200:
                 self.log.error("Keyvalue set failed: %d, %s" %
                             (r.status_code, r.reason))
@@ -129,6 +130,7 @@ class Bridge(BaseHTTPRequestHandler):
         except Exception as e:
             self.log.error("Exception in do_POST: " + str(e))
             self._respond(500, "Internal exception")
+            raise
 
 def run(log, port=8080):
     server_address = ('127.0.0.1', port)
