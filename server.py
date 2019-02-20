@@ -31,13 +31,16 @@ class Bridge(BaseHTTPRequestHandler):
     log = None
     config = None
 
-    def _set_headers(self):
+    def do_HEAD(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 
-    def do_HEAD(self):
-        self._set_headers()
+    def _respond(self, code, message):
+        self.send_response(code)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write("<html><body>"+message+"</body></html>")
 
     def do_POST(self):
         path = urlparse.urlparse(self.path)
@@ -45,14 +48,12 @@ class Bridge(BaseHTTPRequestHandler):
         log.info("Parts: %s"%str(parts))
         if len(parts) != 2:
             log.info("Invalid path length: %s"%path.path)
-            self.send_response(400)
-            self.end_headers()
+            self._respond(400, "Invalid path")
             return
 
         if parts[0] not in ("/twilio", "twilio"):
             log.info("Not a twilio request: %s"%path.path)
-            self.send_response(404)
-            self.end_headers()
+            self._respond(404, "not a twilio path")
             return
 
         # reload config
@@ -68,13 +69,11 @@ class Bridge(BaseHTTPRequestHandler):
                 flow_data["From"] = self.config[flow]["From"]
             else:
                 self.log.error("Flow '%s' is missing parameters in the config"%flow)
-                self.send_response(500)
-                self.end_headers()
+                self._respond(500, "flow is missing parameters in the server config")
                 return
         else:
             self.log.info("Alert recieved for unknown flow '%s'"%flow)
-            self.send_response(404)
-            self.end_headers()
+            self._respond(404, "unknown flow")
             return
 
         # At this point there is a valid populated twilio flow
@@ -90,9 +89,7 @@ class Bridge(BaseHTTPRequestHandler):
         if r.status_code != 200:
             self.log.error("Keyvalue create failed: %d, %s" %
                            (r.status_code, r.reason))
-            self.send_response(500)
-            self.end_headers()
-            self.wfile.write(r.reason)
+            self._respond(500, "keyvalue creation failed: " + r.reason)
             return
 
         post_data["status_path"] = r.content.strip().replace(
@@ -102,17 +99,14 @@ class Bridge(BaseHTTPRequestHandler):
         if r.status_code != 200:
             self.log.error("Keyvalue set failed: %d, %s" %
                            (r.status_code, r.reason))
-            self.send_response(500)
-            self.end_headers()
-            self.wfile.write(r.reason)
+            self._respond(500, "keyvalue set: " + r.reason)
             return
 
         recipient_conf = flow+".recipients"
         if not recipient_conf in self.config:
             self.log.error(
                 "Flow '%s' is missing the .recipients in the config" % flow)
-            self.send_response(500)
-            self.end_headers()
+            self._respond(500, "flow has no recipients")
             return
 
         for name, number in self.config[recipient_conf].items():
@@ -123,17 +117,13 @@ class Bridge(BaseHTTPRequestHandler):
             self.log.info("URL: %s"%(resp.url))
             if resp.status_code != 200:
                 self.log.error("Twilio POST failed: %d, %s"%(resp.status_code, resp.reason))
-                self.send_response(500)
-                self.end_headers()
-                self.wfile.write(resp.reason)
+                self._respond(500, "Twilio post failed: " + resp.reason)
                 return
 
         # All done
         self.log.info("Twilio POST SUCCEEDED!")
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write("sucess")
-
+        self.respon(200, "success")
+        return
 
 def run(log, port=8080):
     server_address = ('', port)
