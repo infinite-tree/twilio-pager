@@ -41,13 +41,13 @@ class Bridge(BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        self.wfile.write("<html><body>"+message+"</body></html>")
+        self.wfile.write("<html><body>"+message+"</body></html>".encode('utf-8'))
         self.finish()
 
     def do_POST(self):
         try:
             log.info("POST received: " + self.path)
-            path = urlparse.urlparse(self.path)
+            path = urlparse(self.path)
             parts = os.path.split(path.path)
             log.info("Parts: %s"%str(parts))
             if len(parts) != 2:
@@ -76,7 +76,7 @@ class Bridge(BaseHTTPRequestHandler):
                     self._respond(500, "flow is missing parameters in the server config")
                     return
             else:
-                self.log.info("Alert recieved for unknown flow '%s'"%flow)
+                self.log.info("Alert recieved for unknown flow '%s'" % flow)
                 self._respond(404, "unknown flow")
                 return
 
@@ -130,7 +130,7 @@ class Bridge(BaseHTTPRequestHandler):
             return
         except Exception as e:
             self.log.error("Exception in do_POST: " + str(e))
-            self.respond(500, "Internal exception")
+            self._respond(500, "Internal exception")
 
 def run(log, port=8080):
     server_address = ('127.0.0.1', port)
