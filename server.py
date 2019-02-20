@@ -43,6 +43,7 @@ class Bridge(BaseHTTPRequestHandler):
         self.wfile.write("<html><body>"+message+"</body></html>")
 
     def do_POST(self):
+        log.info("POST received: " + self.path)
         path = urlparse.urlparse(self.path)
         parts = os.path.split(path.path)
         log.info("Parts: %s"%str(parts))
