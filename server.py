@@ -35,6 +35,7 @@ class Bridge(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
+        self.finish()
 
     def _respond(self, code, message):
         self.send_response(code)
@@ -53,7 +54,7 @@ class Bridge(BaseHTTPRequestHandler):
             self._respond(400, "Invalid path")
             return
 
-        if parts[0] not in ("/twilio", "twilio"):
+        if parts[0].strip('/') != "twilio":
             log.info("Not a twilio request: %s"%path.path)
             self._respond(404, "not a twilio path")
             return
@@ -128,7 +129,7 @@ class Bridge(BaseHTTPRequestHandler):
         return
 
 def run(log, port=8080):
-    server_address = ('', port)
+    server_address = ('127.0.0.1', port)
     httpd = HTTPServer(server_address, Bridge)
     log.info('Starting httpd...')
     httpd.serve_forever()
