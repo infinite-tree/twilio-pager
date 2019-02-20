@@ -41,6 +41,7 @@ class Bridge(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html')
         self.end_headers()
         self.wfile.write("<html><body>"+message+"</body></html>")
+        self.finish()
 
     def do_POST(self):
         log.info("POST received: " + self.path)
