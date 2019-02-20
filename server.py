@@ -41,7 +41,7 @@ class Bridge(BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        self.wfile.write("<html><body>"+message+"</body></html>".encode('utf-8'))
+        self.wfile.write(("<html><body>"+message+"</body></html>").encode('utf-8'))
         self.finish()
 
     def do_POST(self):
@@ -49,7 +49,6 @@ class Bridge(BaseHTTPRequestHandler):
             log.info("POST received: " + self.path)
             path = urlparse(self.path)
             parts = os.path.split(path.path)
-            log.info("Parts: %s"%str(parts))
             if len(parts) != 2:
                 log.info("Invalid path length: %s"%path.path)
                 self._respond(400, "Invalid path")
