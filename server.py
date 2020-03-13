@@ -15,6 +15,7 @@ import sys
 from urllib.parse import urlparse
 
 TWILIO_FLOW_URL = "https://studio.twilio.com/v1/Flows/{sid}/Executions"
+KEY_VALUE_URL = "https://infinite-tree-twilio-store.herokuapp.com"
 
 CONFIG_FILE = "/etc/twilio-pager/twilio-pager.ini"
 if "TWILIO_PAGER_CONFIG" in os.environ:
@@ -88,23 +89,17 @@ class Bridge(BaseHTTPRequestHandler):
             if "evalMatches" in post_data:
                 del(post_data["evalMatches"])
 
-            r = requests.post("https://api.keyvalue.xyz/new/%s"%flow)
+            # Warm up the heroku app
+            r = requests.post("%s/%s/pending"%(KEY_VALUE_URL,flow)
             if r.status_code != 200:
-                self.log.error("Keyvalue create failed: %d, %s" %
-                            (r.status_code, r.reason))
-                self._respond(500, "keyvalue creation failed: " + r.reason)
-                return
+                r = requests.post("%s/%s/pending"%(KEY_VALUE_URL,flow)
+                if r.status_code != 200:
+                    self.log.error("Keyvalue warm-up failed: %d, %s" %
+                                (r.status_code, r.reason))
+                    self._respond(500, "keyvalue warm-up failed: " + r.reason)
+                    return
 
-            post_data["status_path"] = r.content.strip().replace("https://api.keyvalue.xyz/".encode("utf-8"), "".encode("utf-8")).decode()
-            post_path = "https://api.keyvalue.xyz/%s/%s" % (post_data["status_path"], "pending")
-            self.log.info("keyvalue post path: " + post_path)
-            r = requests.post(post_path)
-            if r.status_code != 200:
-                self.log.error("Keyvalue set failed: %d, %s" %
-                            (r.status_code, r.reason))
-                self._respond(500, "keyvalue set: " + r.reason)
-                return
-
+            post_data["status_path"] = flow
             recipient_conf = flow+".recipients"
             if not recipient_conf in self.config:
                 self.log.error(
