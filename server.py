@@ -92,7 +92,7 @@ class Bridge(BaseHTTPRequestHandler):
             # Warm up the heroku app
             r = requests.post("%s/%s/pending"%(KEY_VALUE_URL,flow))
             if r.status_code != 200:
-                r = requests.post("%s/%s/pending"%(KEY_VALUE_URL,flow)
+                r = requests.post("%s/%s/pending"%(KEY_VALUE_URL,flow))
                 if r.status_code != 200:
                     self.log.error("Keyvalue warm-up failed: %d, %s" %
                                 (r.status_code, r.reason))
