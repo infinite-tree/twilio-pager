@@ -90,7 +90,7 @@ class Bridge(BaseHTTPRequestHandler):
                 del(post_data["evalMatches"])
 
             # Warm up the heroku app
-            r = requests.post("%s/%s/pending"%(KEY_VALUE_URL,flow)
+            r = requests.post("%s/%s/pending"%(KEY_VALUE_URL,flow))
             if r.status_code != 200:
                 r = requests.post("%s/%s/pending"%(KEY_VALUE_URL,flow)
                 if r.status_code != 200:
